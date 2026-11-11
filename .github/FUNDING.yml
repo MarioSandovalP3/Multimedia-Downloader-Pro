@@ -1,0 +1,8 @@
+# Este archivo permite mostrar un botón de "Sponsor" en tu repositorio de GitHub
+
+# Puedes usar enlaces personalizados como PayPal, Ko-fi, Buy Me a Coffee, etc.
+# Reemplaza los enlaces por los tuyos.
+
+custom:
+
+  - https://ko-fi.com/coderdev

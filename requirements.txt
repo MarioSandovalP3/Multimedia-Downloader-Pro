@@ -1,0 +1,2 @@
+yt-dlp[default,curl_cffi]>=2025.1.0
+customtkinter>=5.2.2
