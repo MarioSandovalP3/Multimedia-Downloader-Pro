@@ -39,7 +39,7 @@ TRANSLATIONS = {
         'nav_settings': "⚙   Configuración",
         'sys_status': "ESTADO DEL SISTEMA",
         'checking_deps': "Comprobando dependencias…",
-        'donate_btn': "☕ Invítame un café / Donar",
+        'donate_btn': "🤝 Donar / Contribuir",
         'disclaimer': "Este programa es una herramienta diseñada para la descarga de contenido propio o de dominio público. El desarrollador no promueve ni se responsabiliza por la descarga no autorizada de material protegido por derechos de autor.",
         'dl_title': "Descargar contenido",
         'dl_subtitle': "Pega un enlace y configura las opciones de descarga en una sola fila.",
@@ -142,7 +142,7 @@ TRANSLATIONS = {
         'nav_settings': "⚙   Settings",
         'sys_status': "SYSTEM STATUS",
         'checking_deps': "Checking dependencies…",
-        'donate_btn': "☕ Buy me a coffee / Donate",
+        'donate_btn': "🤝 Donate / Contribute",
         'disclaimer': "This program is a tool designed for downloading own content or public domain. The developer does not promote or take responsibility for unauthorized downloading of copyrighted material.",
         'dl_title': "Download content",
         'dl_subtitle': "Paste a link and configure download options in a single row.",
@@ -436,7 +436,7 @@ class MultimediaDownloader(ctk.CTk):
             hover_color="#CFCBC4",
             font=("Segoe UI", 11, "bold"),
             text_color="black",
-            command=self.open_kofi_donation
+            command=self.open_donation
         )
         self.donate_button.pack(fill="x", padx=18, pady=(0, 12))
 
@@ -444,7 +444,7 @@ class MultimediaDownloader(ctk.CTk):
             self.sidebar,
             text=self.t('disclaimer'),
             font=("Segoe UI", 11),
-            text_color="white",
+            text_color="gray",
             justify="left",
             wraplength=200,
         )
@@ -1405,9 +1405,9 @@ class MultimediaDownloader(ctk.CTk):
     def check_updates(self):
         return
 
-    def open_kofi_donation(self):
-        kofi_url = "https://ko-fi.com/usuario"  # Reemplaza con tu enlace de Ko-fi
-        webbrowser.open(kofi_url)
+    def open_donation(self):
+        donation_url = "https://mariosandovalp3.github.io/donaciones/"  # Reemplaza con tu enlace de donación
+        webbrowser.open(donation_url)
 
 
 def clean_error(exc):
