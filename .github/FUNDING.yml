@@ -1,4 +1,5 @@
 # Este archivo permite mostrar un botón de "Sponsor" en tu repositorio de GitHub
 
 # Archivo: .github/FUNDING.yml
-custom: ['https://mariosandovalp3.github.io/donaciones/']
+custom:
+  - https://mariosandovalp3.github.io/donaciones/
