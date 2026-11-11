@@ -212,11 +212,22 @@ Las contribuciones son bienvenidas. Si deseas mejorar el proyecto:
 
 Este proyecto está licenciado bajo la [Licencia MIT](https://opensource.org/licenses/MIT).
 
-## ☕ Apóyame
+## ☕ Apoya el proyecto
 
-Si este proyecto te fue útil, puedes apoyarme con una donación:
+Si esta herramienta te ha sido de utilidad y deseas apoyar su desarrollo y mantenimiento:
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/coderdev)
+<div align="center">
+
+### 💖 Apoya el proyecto
+
+<a href="https://mariosandovalp3.github.io/donaciones/" target="_blank">
+  <img src="https://img.shields.io/badge/Donar-Apoyar%20Proyecto-blue?style=for-the-badge&logo=github&logoColor=white" alt="Apoya el proyecto" />
+</a>
+
+<p><a href="https://mariosandovalp3.github.io/donaciones/" target="_blank">👉 Ver opciones de donación en mi sitio web</a></p>
+
+</div>
+
 
 ---
 
