@@ -109,8 +109,10 @@ TRANSLATIONS = {
         'history_error': "La descarga terminó con un error",
         'ffmpeg_avail': "Disponible",
         'ffmpeg_not': "No instalado",
+        'ffmpeg_inst': "Instalando...",
         'deno_avail': "Disponible",
         'deno_opt': "Opcional",
+        'deno_inst': "Instalando...",
         'quality_best': "Mejor disponible",
         'quality_4k': "Vídeo hasta 2160p (4K)",
         'quality_1080': "Vídeo hasta 1080p",
@@ -212,8 +214,10 @@ TRANSLATIONS = {
         'history_error': "Download ended with an error",
         'ffmpeg_avail': "Available",
         'ffmpeg_not': "Not installed",
+        'ffmpeg_inst': "Installing...",
         'deno_avail': "Available",
         'deno_opt': "Optional",
+        'deno_inst': "Installing...",
         'quality_best': "Best available",
         'quality_4k': "Video up to 2160p (4K)",
         'quality_1080': "Video up to 1080p",
@@ -311,6 +315,8 @@ class MultimediaDownloader(ctk.CTk):
         self.active_download = False
         self.download_thread = None
         self.current_page = None
+        self.installing_ffmpeg = False
+        self.installing_deno = False
 
         self.url_var = ctk.StringVar()
         self.folder_var = ctk.StringVar(value=self.config_data.get("folder", str(DEFAULT_DOWNLOAD_DIR)))
@@ -479,7 +485,6 @@ class MultimediaDownloader(ctk.CTk):
         link_row.pack(fill="x", padx=self.PADDING, pady=(0, 10))
         self.url_entry = ctk.CTkEntry(link_row, textvariable=self.url_var, height=self.ENTRY_HEIGHT, placeholder_text=self.t('url_placeholder'))
         self.url_entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
-        self.url_var.trace_add("write", self._on_url_change)
         ctk.CTkButton(link_row, text=self.t('paste_btn'), width=80, height=self.ENTRY_HEIGHT, command=self.paste_url).pack(side="right")
 
         options = self._card()
@@ -951,6 +956,8 @@ class MultimediaDownloader(ctk.CTk):
                     self.status_var.set(f"{self.t('status_downloading')} · {speed_text} · ETA {eta_text}")
                 elif event == "status":
                     self.status_var.set(payload)
+                elif event == "update_deps":
+                    self._update_dependencies_label()
                 elif event == "download_finished":
                     url, success, details = payload
                     self.active_download = False
@@ -996,15 +1003,108 @@ class MultimediaDownloader(ctk.CTk):
             pass
         self.after(120, self._process_events)
 
+    # ---------------------- DEPENDENCIES & AUTO-INSTALL ----------------------
     def _check_dependencies(self):
         self._update_dependencies_label()
+        ffmpeg = shutil.which("ffmpeg")
+        deno = shutil.which("deno")
+        if not ffmpeg or not deno:
+            threading.Thread(target=self._auto_install_missing_deps, args=(not ffmpeg, not deno), daemon=True).start()
 
     def _update_dependencies_label(self):
         if not hasattr(self, 'dependencies_label') or not self.dependencies_label.winfo_exists(): return
+        
+        self._refresh_system_paths()
+        
         ffmpeg = shutil.which("ffmpeg")
         deno = shutil.which("deno")
-        lines = [f"FFmpeg: {self.t('ffmpeg_avail') if ffmpeg else self.t('ffmpeg_not')}", f"Deno: {self.t('deno_avail') if deno else self.t('deno_opt')}"]
+        
+        ffmpeg_text = self.t('ffmpeg_avail') if ffmpeg else (self.t('ffmpeg_inst') if self.installing_ffmpeg else self.t('ffmpeg_not'))
+        deno_text = self.t('deno_avail') if deno else (self.t('deno_inst') if self.installing_deno else self.t('deno_opt'))
+        
+        lines = [f"FFmpeg: {ffmpeg_text}", f"Deno: {deno_text}"]
         self.dependencies_label.configure(text="\n".join(lines))
+
+    def _refresh_system_paths(self):
+        """Añade rutas comunes de instalación al PATH de la sesión actual."""
+        if sys.platform == "win32":
+            local_app_data = os.environ.get("LOCALAPPDATA", "")
+            winget_packages = Path(local_app_data) / "Microsoft" / "WinGet" / "Packages"
+            if winget_packages.exists():
+                for path in winget_packages.glob("**/*"):
+                    if path.is_dir() and any(p.name.lower() in ("ffmpeg.exe", "deno.exe") for p in path.glob("*.exe")):
+                        if str(path) not in os.environ["PATH"]:
+                            os.environ["PATH"] = str(path) + os.pathsep + os.environ["PATH"]
+        else:
+            deno_bin = str(Path.home() / ".deno" / "bin")
+            if deno_bin not in os.environ["PATH"] and Path(deno_bin).exists():
+                os.environ["PATH"] = deno_bin + os.pathsep + os.environ["PATH"]
+
+    def _auto_install_missing_deps(self, need_ffmpeg, need_deno):
+        """Instala automáticamente las dependencias faltantes y actualiza la UI de forma reactiva."""
+        try:
+            if sys.platform == "win32":
+                if need_ffmpeg:
+                    self.installing_ffmpeg = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando FFmpeg automáticamente..."))
+                    subprocess.run(
+                        ["winget", "install", "--id", "Gyan.FFmpeg", "-e", "--silent", "--accept-source-agreements", "--accept-package-agreements"],
+                        capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                    )
+                    self.installing_ffmpeg = False
+                    self.events.put(("update_deps", None))
+                
+                if need_deno:
+                    self.installing_deno = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando Deno automáticamente..."))
+                    subprocess.run(
+                        ["winget", "install", "--id", "DenoLand.Deno", "-e", "--silent", "--accept-source-agreements", "--accept-package-agreements"],
+                        capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                    )
+                    self.installing_deno = False
+                    self.events.put(("update_deps", None))
+                    
+            elif sys.platform == "darwin":
+                if need_ffmpeg and shutil.which("brew"):
+                    self.installing_ffmpeg = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando FFmpeg..."))
+                    subprocess.run(["brew", "install", "ffmpeg"], capture_output=True)
+                    self.installing_ffmpeg = False
+                    self.events.put(("update_deps", None))
+                if need_deno and shutil.which("brew"):
+                    self.installing_deno = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando Deno..."))
+                    subprocess.run(["brew", "install", "deno"], capture_output=True)
+                    self.installing_deno = False
+                    self.events.put(("update_deps", None))
+                    
+            elif sys.platform.startswith("linux"):
+                if need_ffmpeg and shutil.which("apt-get"):
+                    self.installing_ffmpeg = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando FFmpeg..."))
+                    subprocess.run(["sudo apt-get update && sudo apt-get install -y ffmpeg"], shell=True, capture_output=True)
+                    self.installing_ffmpeg = False
+                    self.events.put(("update_deps", None))
+                if need_deno:
+                    self.installing_deno = True
+                    self.events.put(("update_deps", None))
+                    self.events.put(("status", "Instalando Deno..."))
+                    subprocess.run(["curl -fsSL https://deno.land/install.sh | sh"], shell=True, capture_output=True)
+                    self.installing_deno = False
+                    self.events.put(("update_deps", None))
+                    
+        except Exception as e:
+            print(f"Error en auto-instalación: {e}")
+        finally:
+            self.installing_ffmpeg = False
+            self.installing_deno = False
+            self.events.put(("update_deps", None))
+            self.events.put(("status", self.t('status_ready')))
 
     def open_donation(self):
         webbrowser.open("https://mariosandovalp3.github.io/donaciones/")
