@@ -958,6 +958,13 @@ class MultimediaDownloader(ctk.CTk):
                     self.status_var.set(payload)
                 elif event == "update_deps":
                     self._update_dependencies_label()
+                elif event == "stop_progress_bar":
+                    if hasattr(self, "progress_bar") and self.progress_bar.winfo_exists():
+                        self.progress_bar.stop()
+                        self.progress_bar.configure(mode="determinate")
+                        self.progress_bar.set(0)
+                        if hasattr(self, "progress_percent") and self.progress_percent.winfo_exists():
+                            self.progress_percent.configure(text="0%")
                 elif event == "download_finished":
                     url, success, details = payload
                     self.active_download = False
@@ -1009,6 +1016,10 @@ class MultimediaDownloader(ctk.CTk):
         ffmpeg = shutil.which("ffmpeg")
         deno = shutil.which("deno")
         if not ffmpeg or not deno:
+            # Activar animación de carga en la barra de progreso principal
+            if hasattr(self, "progress_bar") and self.progress_bar.winfo_exists():
+                self.progress_bar.configure(mode="indeterminate")
+                self.progress_bar.start()
             threading.Thread(target=self._auto_install_missing_deps, args=(not ffmpeg, not deno), daemon=True).start()
 
     def _update_dependencies_label(self):
@@ -1041,13 +1052,13 @@ class MultimediaDownloader(ctk.CTk):
                 os.environ["PATH"] = deno_bin + os.pathsep + os.environ["PATH"]
 
     def _auto_install_missing_deps(self, need_ffmpeg, need_deno):
-        """Instala automáticamente las dependencias faltantes y actualiza la UI de forma reactiva."""
+        """Instala automáticamente las dependencias faltantes y controla la barra de progreso."""
         try:
             if sys.platform == "win32":
                 if need_ffmpeg:
                     self.installing_ffmpeg = True
                     self.events.put(("update_deps", None))
-                    self.events.put(("status", "Instalando FFmpeg automáticamente..."))
+                    self.events.put(("status", "Instalando FFmpeg automáticamente (esto puede tardar unos minutos)..."))
                     subprocess.run(
                         ["winget", "install", "--id", "Gyan.FFmpeg", "-e", "--silent", "--accept-source-agreements", "--accept-package-agreements"],
                         capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
@@ -1104,6 +1115,7 @@ class MultimediaDownloader(ctk.CTk):
             self.installing_ffmpeg = False
             self.installing_deno = False
             self.events.put(("update_deps", None))
+            self.events.put(("stop_progress_bar", None))
             self.events.put(("status", self.t('status_ready')))
 
     def open_donation(self):
