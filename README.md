@@ -1,6 +1,24 @@
-﻿# Multimedia Downloader Pro
+﻿# 
 
-Una aplicación de escritorio moderna, ligera y fácil de usar desarrollada en **Python** con **Tkinter** y potenciada por **yt-dlp**. Permite descargar vídeos, reels, publicaciones y listas de reproducción de YouTube, TikTok, Instagram, Facebook y más de 1800 sitios web compatibles.
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/devforge_icon.png" />
+    <img src="assets/devforge_icon.png" alt="Multimedia Downloader Pro" width="96" />
+  </picture>
+  <h1>Multimedia Downloader Pro</h1>
+  <p>Una aplicación de escritorio moderna, ligera y fácil de usar desarrollada en **Python** con **Tkinter** y potenciada por **yt-dlp**. Permite descargar vídeos, reels, publicaciones y listas de reproducción de YouTube, TikTok, Instagram, Facebook y más de 1800 sitios web compatibles.</p>
+  <p>
+    <img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="Versión 1.0.0" />
+    <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/platform-Windows-0078D6?style=flat-square&logo=windows" alt="Plataforma Windows" />
+  </p>
+</div>
+
+<div>
+  
+![Preview](assets/preview.png)
+
+</div>
 
 ---
 
@@ -80,7 +98,7 @@ py -m venv .venv
 **Windows (CMD):**
 ```cmd
 py -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.venv\Scripts\activate.bat
 ```
 
 **macOS / Linux:**
