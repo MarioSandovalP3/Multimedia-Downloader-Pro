@@ -15,7 +15,7 @@
 </div>
 
 <div>
-  
+
 ![Preview](assets/preview.png)
 
 </div>
@@ -45,6 +45,20 @@ Antes de instalar, asegúrate de tener lo siguiente:
 | **yt-dlp** | Última versión | Motor de descarga (se instala con pip) |
 | **FFmpeg** | Cualquier reciente | Obligatorio para combinar vídeo/audio y convertir a MP3 |
 | **Deno** | Cualquier reciente | Recomendado para desafíos de JavaScript de YouTube |
+
+## Descarga
+
+Si solo quieres usar la aplicación sin instalar Python ni compilar el código, descarga el ejecutable listo para usar en Windows:
+
+[![Descargar en Gumroad](https://img.shields.io/badge/Descargar%20Ejecutable-Gumroad%20(v1.0.0)-FF90E8?style=flat-square&logo=gumroad&logoColor=black)](https://mariosandovaldev.gumroad.com/l/MultimediaDownloaderPro)
+
+👉 **[Descargar Multimedia Downloader Pro para Windows (v1.0.0) en Gumroad](https://mariosandovaldev.gumroad.com/l/MultimediaDownloaderPro)**
+
+> **Nota para usuarios de Windows:** Al tratarse de una aplicación independiente sin firma comercial de pago, Windows SmartScreen puede mostrar una advertencia la primera vez que la ejecutes. Haz clic en **"Más información"** y luego en **"Ejecutar de todas formas"** para abrir el programa con normalidad.
+---
+
+
+
 
 ### Instalar herramientas del sistema (no son paquetes de Python)
 
